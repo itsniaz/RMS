@@ -65,12 +65,9 @@ public class userUI extends JFrame  implements ActionListener
     }
     public void buildnAddProfile()
     {
-
         //face icon Label
         displayPanel.setBounds(165, 0, 685, 560);
-        
-        
-        
+  
         picIcon.setIcon(new ImageIcon("rsc/facesmall.png"));
         picIcon.setBounds(295, 50, 155, 150);
         displayPanel.add(picIcon);

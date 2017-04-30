@@ -72,8 +72,7 @@ public class loginUI extends JFrame implements ActionListener
         else if(con.validate(uid, pass))
         {
           
-            userPanel = new userUI(this);
-            userPanel.run(username.getText());
+            userPanel = new userUI(this,uid);
             this.setVisible(false);
 
         }

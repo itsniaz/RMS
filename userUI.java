@@ -9,8 +9,18 @@ public class userUI extends JFrame  implements ActionListener
     private mysqlConn connection;
 
    //
+   String uid;
+
     private JPanel menuPanel = new JPanel(null);
+    private JPanel profilePanel = new JPanel(null);
+    private JPanel coachPanel = new JPanel(null);
+
+
+
     private JPanel displayPanel = new JPanel(null);
+
+
+
     private JLabel menu      = new JLabel("Menu");
     private JLabel picIcon    = new JLabel();
     private JButton btnProfile  = new JButton("Profile");
@@ -38,6 +48,8 @@ public class userUI extends JFrame  implements ActionListener
     private JButton btnListMenu[] = {btnProfile,btnCoach,btnTicket,btnLogout};
     Font pLabelFont = new Font("sansserif",Font.BOLD,17);
 
+    //For coachPanel
+
    
      public userUI()
     {
@@ -55,31 +67,44 @@ public class userUI extends JFrame  implements ActionListener
       setLayout(null);
     }
 
-    public userUI(loginUI aui)
+    public userUI(loginUI aui,String uid)
     {
       connection = new mysqlConn();      
       this.lui = aui;
       setLayout(null);
 
-      
-    }
-    public void buildnAddProfile()
-    {
-        //face icon Label
-        displayPanel.setBounds(165, 0, 685, 560);
+      this.uid = uid;
+
+
+        setSize(875,605);
+        setLocationRelativeTo(null);
+        buildMenuBar();
+        buildProfilePanel();
+        addProfilePanel();
+
+        setVisible(true);
+        setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
+       //displayPanel.setBounds(170, 0, 690, 570);
   
+    }
+    public void buildProfilePanel()
+    {
+        
+        profilePanel.setSize(685, 560);
+  
+        //face icon 
         picIcon.setIcon(new ImageIcon("rsc/facesmall.png"));
         picIcon.setBounds(295, 50, 155, 150);
-        displayPanel.add(picIcon);
+        profilePanel.add(picIcon);
 
         //addiing edit and update button
         btnEdit.setBounds(260, 460, 85, 35);
         btnEdit.addActionListener(this);
-        displayPanel.add(btnEdit);
+        profilePanel.add(btnEdit);
 
         btnUpdate.setBounds(355, 460, 90, 35);
         btnUpdate.addActionListener(this);
-        displayPanel.add(btnUpdate);
+        profilePanel.add(btnUpdate);
 
         nameLabel.setBounds(90, 205 , 105, 25 );
         mnoLabel.setBounds(90, 270 , 105, 25);
@@ -99,23 +124,17 @@ public class userUI extends JFrame  implements ActionListener
          pTelements[i].setEditable(false);
          pLelements[i].setFont(pLabelFont);
        }
-       for(int i = 0 ; i<btnListMenu.length; i++)
-       {
-         btnListMenu[i].addActionListener(this);
-       }
-       
+     
 
-        displayPanel.add(nameLabel);
-        displayPanel.add(nameField);
-        displayPanel.add(mnoLabel);
-        displayPanel.add(mNoField);
-        displayPanel.add(userNameLabel);
-        displayPanel.add(usernameField);
-        displayPanel.add(passwordLabel);
-        displayPanel.add(passwordField);
+        profilePanel.add(nameLabel);
+        profilePanel.add(nameField);
+        profilePanel.add(mnoLabel);
+        profilePanel.add(mNoField);
+        profilePanel.add(userNameLabel);
+        profilePanel.add(usernameField);
+        profilePanel.add(passwordLabel);
+        profilePanel.add(passwordField);
 
-
-        add(displayPanel);
     }
 
     public void buildMenuBar()
@@ -142,22 +161,34 @@ public class userUI extends JFrame  implements ActionListener
         btnTicket.setBounds(25, 160, 90, 45);
         btnLogout.setBounds(30, 410, 90, 45);
 
+        connection.setProfileInfo(this,uid);
+
+          for(int i = 0 ; i<btnListMenu.length; i++)
+       {
+         btnListMenu[i].addActionListener(this);
+       }
+       
         add(menuPanel);
     }
 
-    public void run(String uname)
+    public void builder(String uname)
     {   
         buildMenuBar();
-        buildnAddProfile();
+        buildProfilePanel();
 
-        connection.setProfileInfo(this,uname);
+    }
 
-        setSize(875,605);
-       // SwingUtilities.updateComponentTreeUI(getRootPane());
-        setVisible(true);
-        setLocationRelativeTo(null);
-        setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
+    //Panel Controlling
 
+    public void addProfilePanel()
+    {
+      
+      displayPanel.removeAll();
+      displayPanel.revalidate();
+      displayPanel.repaint();
+      
+      displayPanel.add(profilePanel);
+      add(displayPanel);
     }
 
     @Override
@@ -180,6 +211,11 @@ public class userUI extends JFrame  implements ActionListener
       else if(e.getSource() == btnUpdate )
       {
         connection.updateProfile(this,usernameField.getText());
+      }
+      else if(e.getSource() == btnProfile)
+      {
+          addProfilePanel();
+          System.out.println("I got poked");
       }
     
     }

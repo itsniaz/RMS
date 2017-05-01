@@ -1,8 +1,10 @@
 import java.awt.*;
 import java.awt.event.*;
+import java.sql.ResultSet;
+
 import javax.swing.*;
 
-public class userUI extends JFrame  implements ActionListener
+public class userUI extends JFrame  implements ActionListener,ItemListener
 {
 
     private loginUI lui;
@@ -214,6 +216,10 @@ public class userUI extends JFrame  implements ActionListener
         cbFrom.setBounds(235, 60, 100, 26);
         cbTo.setBounds(410, 60, 100, 26);
         cbTime.setBounds(235, 105, 170, 26);
+
+        cbFrom.addItemListener(this);
+         cbTo.addItemListener(this);
+
        
        // cbSeatType.setBounds(235,150,70,26);
 
@@ -304,6 +310,8 @@ public class userUI extends JFrame  implements ActionListener
       btnGetCost.setBounds(150, 365, 80, 35);
       btnSubmit.setBounds(240,365,75,35);
 
+      
+
       ticketPanel.add(cbTFrom);
       ticketPanel.add(cbTTo);
       ticketPanel.add(lFrom);
@@ -388,6 +396,42 @@ public class userUI extends JFrame  implements ActionListener
       }
     
     }
+
+  @Override
+  public void itemStateChanged(ItemEvent evt) {
+    JComboBox cb = (JComboBox) evt.getSource();
+
+    Object item = evt.getItem();
+
+  
+    if (evt.getStateChange() == ItemEvent.SELECTED) {
+
+      cbTime.removeAllItems();
+      String sFrom = "'"+cbFrom.getSelectedItem()+"'";
+      String sTo = "'"+cbTo.getSelectedItem()+"'";
+       
+       String sql = "SELECT STime FROM `T_schedule` WHERE `LFrom` = +"+sFrom+ "AND" +" `LTo` = "+sTo;
+       try{
+        ResultSet rs = connection.getResult(sql);
+       
+        while(rs.next())
+        {
+          // cbTime.removeAll();
+          //cbTime.insertItemAt(rs.getString("Time"),i);
+          //i++;
+          cbTime.addItem(rs.getString("STime"));
+        }
+       }
+       catch(Exception exception)
+       {
+
+       }
+
+    }
+  else if (evt.getStateChange() == ItemEvent.DESELECTED) {
+      // Item is no longer selected
+    }
+  }
   /* public static void main(String[] args)
     {
         userUI ui = new userUI();

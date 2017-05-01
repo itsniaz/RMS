@@ -159,4 +159,21 @@ public class mysqlConn
         }
     }
 
+    public ResultSet getResult(String sql)
+    {
+        try
+        {
+        stmt = conn.createStatement();
+        rs = stmt.executeQuery(sql);
+
+        return rs;
+        }
+        catch(Exception e)
+        {
+            JOptionPane.showMessageDialog(null, "Query Failed");
+        }
+
+        return null;
+    }
+
 }

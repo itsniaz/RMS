@@ -14,7 +14,8 @@ public class userUI extends JFrame  implements ActionListener
     private JPanel menuPanel = new JPanel(null);
     private JPanel profilePanel = new JPanel(null);
     private JPanel coachPanel = new JPanel(null);
-
+    private JPanel ticketPanel = new JPanel(null);
+   
 
 
     private JPanel displayPanel = new JPanel(null);
@@ -49,10 +50,10 @@ public class userUI extends JFrame  implements ActionListener
     Font pLabelFont = new Font("sansserif",Font.BOLD,17);
 
     //For coachPanel
-    public JLabel lFrom;
-    public JLabel lTo;
+    public JLabel lFrom = new JLabel("From");
+    public JLabel lTo = new JLabel("To");
     public JLabel lTime;
-    public JLabel lSeatType;
+    public JLabel lSeatType = new JLabel("Seat Type");
     public JLabel lTrainName;
 
     public JComboBox cbFrom;
@@ -61,6 +62,21 @@ public class userUI extends JFrame  implements ActionListener
     public JComboBox cbSeatType;
 
     public String[] locations = {"Dhaka","Chittagong","Noakhali","Kishorgonj","Sylhet"}; 
+
+    //For ticketPanel
+    public JComboBox cbPerson;
+    public Object[] personNo = {1,2,3,4};
+    public JTextField fjourneyDate = new JTextField("dd/mm/yy");
+    public JTextField ftxnID = new JTextField();
+    public JLabel ldate = new JLabel("Date");
+    public JLabel lPerson = new JLabel("Person");
+    public JLabel ltxnID = new JLabel("Txn ID");
+    public JButton btnGetCost = new JButton("Get Cost");
+    public JButton btnSubmit = new JButton("Submit");
+
+    public JComboBox cbTFrom;
+    public JComboBox cbTTo;
+    public JComboBox cbTSeatType;
 
    
      public userUI()
@@ -190,8 +206,6 @@ public class userUI extends JFrame  implements ActionListener
         cbTo = new JComboBox<>(locations);
         cbTime = new JComboBox<>();
         cbSeatType = new JComboBox<>();
-        lTo = new JLabel("To");
-        lFrom = new JLabel("From");
         lTime = new JLabel("Time");
         lTrainName = new JLabel("Train Name");
        // lSeatType = new JLabel("Seat");
@@ -253,11 +267,75 @@ public class userUI extends JFrame  implements ActionListener
       add(displayPanel);
       SwingUtilities.updateComponentTreeUI(displayPanel);
     }
+
+    public void buildTicketPanel()
+    {
+      ticketPanel.setSize(660,570);
+
+      String[] typeOfSeats = {"AC","Shulobh","Shobhon"};
+      cbTFrom = new JComboBox<>(locations);
+      cbTTo = new JComboBox<>(locations);
+      cbTSeatType = new JComboBox<>(typeOfSeats);
+      cbPerson = new JComboBox<>(personNo);
+
+
+      lFrom = new JLabel("From");
+      lTo   = new JLabel("To");
+      lSeatType = new JLabel("Seat Type");
+
+      cbTFrom.setBounds(150,90,125,25);
+      cbTTo.setBounds(360,90,125,25);
+      lFrom.setBounds(85, 90, 35, 26);
+      lTo.setBounds(315,90, 30, 35);
+
+      cbTSeatType.setBounds(150, 150, 135, 30);
+      lSeatType.setBounds(85,155,55,20);
+
+      cbPerson.setBounds(150, 200, 60, 25);
+      lPerson.setBounds(85, 205, 50, 16);
+      
+
+      ldate.setBounds(85,255,35,15);
+      fjourneyDate.setBounds(150, 250, 165, 25);
+
+      ltxnID.setBounds(85, 310, 40, 20);
+      ftxnID.setBounds(150,305,165,28);
+
+      btnGetCost.setBounds(150, 365, 80, 35);
+      btnSubmit.setBounds(240,365,75,35);
+
+      ticketPanel.add(cbTFrom);
+      ticketPanel.add(cbTTo);
+      ticketPanel.add(lFrom);
+      ticketPanel.add(lTo);
+      ticketPanel.add(cbTSeatType);
+      ticketPanel.add(lSeatType);
+      ticketPanel.add(cbPerson);
+      ticketPanel.add(lPerson);
+      ticketPanel.add(ldate);
+      ticketPanel.add(fjourneyDate);
+      ticketPanel.add(ftxnID);
+      ticketPanel.add(ltxnID);
+      ticketPanel.add(btnSubmit);
+      ticketPanel.add(btnGetCost);
+    }
+
+    public void addTicketPanel()
+    {
+      displayPanel.removeAll();
+      displayPanel.revalidate();
+      displayPanel.repaint();
+      
+      displayPanel.add(ticketPanel);
+      add(displayPanel);
+      SwingUtilities.updateComponentTreeUI(displayPanel);
+    }
     public void builder()
     {   
         buildMenuBar();
         buildProfilePanel();
         buildCoachPanel();
+        buildTicketPanel();
 
     }
 
@@ -303,6 +381,10 @@ public class userUI extends JFrame  implements ActionListener
       else if(e.getSource() == btnCoach)
       {
           addCoachPanel();
+      }
+      else if(e.getSource() == btnTicket)
+      {
+        addTicketPanel();
       }
     
     }

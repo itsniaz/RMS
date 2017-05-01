@@ -1,8 +1,10 @@
 import java.awt.*;
 import java.awt.event.*;
 import java.sql.ResultSet;
-
 import javax.swing.*;
+
+import java.util.Vector;
+import net.proteanit.sql.DbUtils;
 
 public class userUI extends JFrame  implements ActionListener,ItemListener
 {
@@ -63,7 +65,9 @@ public class userUI extends JFrame  implements ActionListener,ItemListener
     public JComboBox cbTime;
     public JComboBox cbSeatType;
 
-    public String[] locations = {"Dhaka","Chittagong","Noakhali","Kishorgonj","Sylhet"}; 
+    public JTable fareTable;
+
+    public String[] locations = {"Dhaka","Chittagong","Sylhet","Rajshahi","Khulna"}; 
 
     //For ticketPanel
     public JComboBox cbPerson;
@@ -209,7 +213,7 @@ public class userUI extends JFrame  implements ActionListener,ItemListener
         cbTime = new JComboBox<>();
         cbSeatType = new JComboBox<>();
         lTime = new JLabel("Time");
-        lTrainName = new JLabel("Train Name");
+        lTrainName = new JLabel();
        // lSeatType = new JLabel("Seat");
 
         //Combo Boxes
@@ -219,6 +223,7 @@ public class userUI extends JFrame  implements ActionListener,ItemListener
 
         cbFrom.addItemListener(this);
          cbTo.addItemListener(this);
+        cbTime.addItemListener(this);
 
        
        // cbSeatType.setBounds(235,150,70,26);
@@ -227,7 +232,8 @@ public class userUI extends JFrame  implements ActionListener,ItemListener
         lFrom.setBounds(150, 60, 35, 20);
         lTo.setBounds(375, 65, 20, 16);
         lTime.setBounds(150, 110, 50, 16);
-        lTrainName.setBounds(335, 185, 75, 31);
+        lTrainName.setBounds(310, 185, 300, 50);
+        lTrainName.setFont(new Font("sanserif",Font.BOLD,20));
       //  lSeatType.setBounds(150, 155, 35, 16);
         
 
@@ -243,12 +249,12 @@ public class userUI extends JFrame  implements ActionListener,ItemListener
 
 
        
-       JTable fareTable = new JTable(data,columnNames);
+       fareTable = new JTable();
        JScrollPane js = new JScrollPane(fareTable);
         js.setBounds(80, 230, 585, 310);
-
+      
        
-        coachPanel.add(js);
+       coachPanel.add(js);
        coachPanel.add(cbFrom);
         coachPanel.add(cbTo);
         coachPanel.add(cbTime);
@@ -403,12 +409,42 @@ public class userUI extends JFrame  implements ActionListener,ItemListener
 
     Object item = evt.getItem();
 
-  
-    if (evt.getStateChange() == ItemEvent.SELECTED) {
+     String sFrom = "'"+cbFrom.getSelectedItem()+"'";
+      String sTo = "'"+cbTo.getSelectedItem()+"'";
+
+    if(cb == cbTime)
+    {
+      String tTime = "'"+cbTime.getSelectedItem()+"'";
+      String sql = "Select * from dc";
+     System.out.println(sql);
+      ResultSet  rs = connection.getResult(sql);
+
+      if(cbTime.getSelectedItem() == null)
+      {
+        lTrainName.setText("");
+      }
+
+      fareTable.setModel(DbUtils.resultSetToTableModel(rs));
+      sql = "select T_name from T_Schedule where STime = "+tTime;
+      rs = connection.getResult(sql);
+      System.out.println(sql);
+      try
+      {
+        while(rs.next())
+        {
+        lTrainName.setText(rs.getString("T_Name"));
+      }
+      }
+      catch(Exception e)
+      {
+        System.out.println(e);
+      }
+
+    }
+    else if(evt.getStateChange() == ItemEvent.SELECTED) {
 
       cbTime.removeAllItems();
-      String sFrom = "'"+cbFrom.getSelectedItem()+"'";
-      String sTo = "'"+cbTo.getSelectedItem()+"'";
+
        
        String sql = "SELECT STime FROM `T_schedule` WHERE `LFrom` = +"+sFrom+ "AND" +" `LTo` = "+sTo;
        try{
@@ -416,15 +452,13 @@ public class userUI extends JFrame  implements ActionListener,ItemListener
        
         while(rs.next())
         {
-          // cbTime.removeAll();
-          //cbTime.insertItemAt(rs.getString("Time"),i);
-          //i++;
           cbTime.addItem(rs.getString("STime"));
         }
+
        }
        catch(Exception exception)
        {
-
+        JOptionPane.showMessageDialog(null, exception);
        }
 
     }
@@ -432,6 +466,8 @@ public class userUI extends JFrame  implements ActionListener,ItemListener
       // Item is no longer selected
     }
   }
+
+
   /* public static void main(String[] args)
     {
         userUI ui = new userUI();

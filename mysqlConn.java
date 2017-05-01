@@ -6,12 +6,13 @@ import javax.swing.JOptionPane;
 public class mysqlConn
 {
 
- //static final String DB_URL = "jdbc:mysql://johnny.heliohost.org/trialnly_rms";
-	static final String DB_URL = "jdbc:mysql://alpha.hostmydreams.net/trialnly_rms";
+  static final String DB_URL = "jdbc:mysql://localhost:3306/rms";
+//	static final String DB_URL = "jdbc:mysql://alpha.hostmydreams.net/trialnly_rms";
  
-              static final String USER = "trialnly";
-             //static final String PASS = "Trialnly_1234";
-			 static final String PASS = "Wuff_1234";
+             // static final String USER = "trialnly";
+             //static final String PASS = "Wuff_1234";
+             static final String USER = "root";
+			 static final String PASS = "";
 
         Connection conn;
         Statement stmt;

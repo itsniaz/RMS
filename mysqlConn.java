@@ -171,10 +171,27 @@ public class mysqlConn
         }
         catch(Exception e)
         {
-            JOptionPane.showMessageDialog(null, e);
+            JOptionPane.showMessageDialog(null, "Opss ! Something wrong happened !", "Database Error", JOptionPane.ERROR_MESSAGE);
         }
 
         return null;
+    }
+    public boolean updateDB(String sql)
+    {
+         try
+        {
+        stmt = conn.createStatement();
+        stmt.executeUpdate(sql);
+
+        return true;
+        }
+        catch(Exception e)
+        {
+            if(e instanceof SQLIntegrityConstraintViolationException)
+            JOptionPane.showMessageDialog(null, "Trasection ID is already used");
+        }
+
+        return false;
     }
 
 }

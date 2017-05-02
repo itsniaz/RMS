@@ -75,7 +75,7 @@ public class userUI extends JFrame  implements ActionListener,ItemListener
     //For ticketPanel
     public JComboBox cbPerson;
     public Object[] personNo = {1,2,3,4};
-    public JTextField fjourneyDate = new JTextField("dd/mm/yy");
+    public JTextField fjourneyDate = new JTextField("yyyy/mm/dd");
     public JTextField ftxnID = new JTextField();
     public JLabel ldate = new JLabel("Date");
     public JLabel lPerson = new JLabel("Person");
@@ -87,7 +87,7 @@ public class userUI extends JFrame  implements ActionListener,ItemListener
     public JComboBox cbTTo;
     public JComboBox cbTSeatType;
 
-   
+   public int tCost = 0;
      public userUI()
     {
       connection = new mysqlConn();
@@ -318,6 +318,7 @@ public class userUI extends JFrame  implements ActionListener,ItemListener
       btnGetCost.setBounds(150, 365, 80, 35);
       btnGetCost.addActionListener(this);
       btnSubmit.setBounds(240,365,75,35);
+      btnSubmit.addActionListener(this);
 
       
 
@@ -388,28 +389,69 @@ public class userUI extends JFrame  implements ActionListener,ItemListener
         }
         else
         {
-          String sql;
+          String sql="";
           String  seat = "'"+cbTSeatType.getSelectedItem()+"'";
           int fare = 0;
           if(cbTFrom.getSelectedItem().equals("Dhaka") && cbTTo.getSelectedItem().equals("Chittagong") || cbTTo.getSelectedItem().equals("Dhaka") && cbTFrom.getSelectedItem().equals("Chittagong"))
           {
 
             sql = "SELECT  `Fare(tk)` FROM `DC` WHERE `Seat Type` = "+seat;
+          }
+          else if(cbTFrom.getSelectedItem().equals("Dhaka") && cbTTo.getSelectedItem().equals("Sylhet") || cbTTo.getSelectedItem().equals("Sylhet") && cbTFrom.getSelectedItem().equals("Dhaka"))
+          {
+            sql = "SELECT  `Fare(tk)` FROM `DS` WHERE `Seat Type` = "+seat;
+          }
+          else if(cbTFrom.getSelectedItem().equals("Dhaka") && cbTTo.getSelectedItem().equals("Rajshahi") || cbTTo.getSelectedItem().equals("Rajshahi") && cbTFrom.getSelectedItem().equals("Dhaka"))
+          {
+            sql = "SELECT  `Fare(tk)` FROM `DR` WHERE `Seat Type` = "+seat;
+          }
+          else if(cbTFrom.getSelectedItem().equals("Dhaka") && cbTTo.getSelectedItem().equals("Khulna") || cbTTo.getSelectedItem().equals("Khulna") && cbTFrom.getSelectedItem().equals("Dhaka"))
+          {
+            sql = "SELECT  `Fare(tk)` FROM `DK` WHERE `Seat Type` = "+seat;
+          }
             try{
               ResultSet rs = connection.getResult(sql);
               while(rs.next())
               {
                 fare = rs.getInt("Fare(tk)") * (int)cbPerson.getSelectedItem();
               }
+              tCost = fare;
               JOptionPane.showMessageDialog(null, "<html>Your total fare is : "+fare+"tk<br>Please Send bKash to :  xxxx  to reserve your seat </html>");
             }
             catch(Exception evv)
             {
 
             }
-          }
         }
         
+      }
+      else if(e.getSource() == btnSubmit)
+      {
+        System.out.println("I was invoked");
+        String dfrom = "'"+cbTFrom.getSelectedItem()+"',";
+        String dto = "'"+cbTTo.getSelectedItem()+"',";
+        String seat = "'"+cbTSeatType.getSelectedItem()+"',";
+        String person = "'"+(int)cbPerson.getSelectedItem()+"',";
+        String date = "'"+fjourneyDate.getText()+"',";
+        String txnID = "'"+ftxnID.getText()+"'";
+        String vTxnID = ftxnID.getText();
+        String name = "'"+nameField.getText()+"',";
+        String sql = "";
+        String totalCost = "'"+tCost+"',";
+        if(vTxnID.startsWith("SA"))
+        {
+          sql = "INSERT INTO `tkt`(`Name`, `DFrom`, `DTo`, `SeatType`, `Person`, `TotalCost`,`JourneyDate`,`TxnID`) VALUES ("+name+dfrom+dto+seat+person+totalCost+date+txnID+")";
+          System.out.println(sql);
+          if(connection.updateDB(sql))
+          {
+            JOptionPane.showMessageDialog(null, "Purchase Sucessful");
+          }
+        }
+        else
+        {
+          JOptionPane.showMessageDialog(null, "Invalid TxnID", "Purchase Failed", JOptionPane.ERROR_MESSAGE);
+        }
+
       }
       else if(e.getSource() == btnEdit)
       {

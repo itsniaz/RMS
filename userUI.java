@@ -1,7 +1,10 @@
 import java.awt.*;
 import java.awt.event.*;
 import java.sql.ResultSet;
+
+import javax.net.ssl.ExtendedSSLSession;
 import javax.swing.*;
+import javax.swing.table.DefaultTableModel;
 
 import java.util.Vector;
 import net.proteanit.sql.DbUtils;
@@ -239,14 +242,6 @@ public class userUI extends JFrame  implements ActionListener,ItemListener
 
 
         //JTable
-       String[] columnNames = {"Seat Type","Fare(Tk)"};
-        Object[][] data = new Object[][] {
-            {"AC(Berth)",500},
-            {"AC(Seat)",400},
-            {"Shobhon",300}
-    
-        };
-
 
        
        fareTable = new JTable();
@@ -284,10 +279,10 @@ public class userUI extends JFrame  implements ActionListener,ItemListener
     {
       ticketPanel.setSize(660,570);
 
-      String[] typeOfSeats = {"AC","Shulobh","Shobhon"};
+      //String[] typeOfSeats = {"AC","Shulobh","Shobhon"};
       cbTFrom = new JComboBox<>(locations);
       cbTTo = new JComboBox<>(locations);
-      cbTSeatType = new JComboBox<>(typeOfSeats);
+      cbTSeatType = new JComboBox<>();
       cbPerson = new JComboBox<>(personNo);
 
 
@@ -296,11 +291,18 @@ public class userUI extends JFrame  implements ActionListener,ItemListener
       lSeatType = new JLabel("Seat Type");
 
       cbTFrom.setBounds(150,90,125,25);
+      cbTFrom.addItem(this);
       cbTTo.setBounds(360,90,125,25);
+      cbTTo.addItemListener(this);
       lFrom.setBounds(85, 90, 35, 26);
       lTo.setBounds(315,90, 30, 35);
 
       cbTSeatType.setBounds(150, 150, 135, 30);
+      String seats[]={"AC(Berth)","AC(Seat)","1st Class(Berth)","1st Class(Seat)","Snigdha","Shuvon(Chair)","Shuvon","Shulov"};
+      for(String str : seats) {
+            cbTSeatType.addItem(str);
+      }
+      cbTSeatType.addItemListener(this);
       lSeatType.setBounds(85,155,55,20);
 
       cbPerson.setBounds(150, 200, 60, 25);
@@ -314,6 +316,7 @@ public class userUI extends JFrame  implements ActionListener,ItemListener
       ftxnID.setBounds(150,305,165,28);
 
       btnGetCost.setBounds(150, 365, 80, 35);
+      btnGetCost.addActionListener(this);
       btnSubmit.setBounds(240,365,75,35);
 
       
@@ -377,6 +380,37 @@ public class userUI extends JFrame  implements ActionListener,ItemListener
         lui.setVisible(true);
       
       }
+      else if(e.getSource() == btnGetCost)
+      {
+        if(cbTFrom.getSelectedItem().equals(cbTTo.getSelectedItem())){
+
+          JOptionPane.showMessageDialog(null, "Invalid Route");
+        }
+        else
+        {
+          String sql;
+          String  seat = "'"+cbTSeatType.getSelectedItem()+"'";
+          int fare = 0;
+          if(cbTFrom.getSelectedItem().equals("Dhaka") && cbTTo.getSelectedItem().equals("Chittagong") || cbTTo.getSelectedItem().equals("Dhaka") && cbTFrom.getSelectedItem().equals("Chittagong"))
+          {
+
+            sql = "SELECT  `Fare(tk)` FROM `DC` WHERE `Seat Type` = "+seat;
+            try{
+              ResultSet rs = connection.getResult(sql);
+              while(rs.next())
+              {
+                fare = rs.getInt("Fare(tk)") * (int)cbPerson.getSelectedItem();
+              }
+              JOptionPane.showMessageDialog(null, "<html>Your total fare is : "+fare+"tk<br>Please Send bKash to :  xxxx  to reserve your seat </html>");
+            }
+            catch(Exception evv)
+            {
+
+            }
+          }
+        }
+        
+      }
       else if(e.getSource() == btnEdit)
       {
         for(int i=0;i<pTelements.length;i++)
@@ -415,19 +449,16 @@ public class userUI extends JFrame  implements ActionListener,ItemListener
     if(cb == cbTime)
     {
       String tTime = "'"+cbTime.getSelectedItem()+"'";
-      String sql = "Select * from dc";
-     System.out.println(sql);
-      ResultSet  rs = connection.getResult(sql);
-
+      String sql;
+      ResultSet  rs;
       if(cbTime.getSelectedItem() == null)
       {
         lTrainName.setText("");
       }
 
-      fareTable.setModel(DbUtils.resultSetToTableModel(rs));
-      sql = "select T_name from T_Schedule where STime = "+tTime;
+     // fareTable.setModel(DbUtils.resultSetToTableModel(rs));
+      sql = "select T_name from T_schedule where STime = "+tTime;
       rs = connection.getResult(sql);
-      System.out.println(sql);
       try
       {
         while(rs.next())
@@ -435,6 +466,7 @@ public class userUI extends JFrame  implements ActionListener,ItemListener
         lTrainName.setText(rs.getString("T_Name"));
       }
       }
+
       catch(Exception e)
       {
         System.out.println(e);
@@ -455,12 +487,38 @@ public class userUI extends JFrame  implements ActionListener,ItemListener
           cbTime.addItem(rs.getString("STime"));
         }
 
+        if(cbFrom.getSelectedItem().equals("Dhaka") && cbTo.getSelectedItem().equals("Chittagong")||cbFrom.equals("Chittagong") && cbTo.equals("Dhaka"))
+        {
+        sql = "select * from DC" ;
+        rs = connection.getResult(sql);
+        fareTable.setModel(DbUtils.resultSetToTableModel(rs));
+      }
+      else if(cbFrom.getSelectedItem().equals("Dhaka") && cbTo.getSelectedItem().equals("Sylhet")||cbFrom.equals("Sylhet") && cbTo.equals("Dhaka"))
+      {
+        sql = "select * from DS" ;
+        rs = connection.getResult(sql);
+       fareTable.setModel(DbUtils.resultSetToTableModel(rs));
+      }
+      else if(cbFrom.getSelectedItem().equals("Dhaka") && cbTo.getSelectedItem().equals("Rajshahi")||cbFrom.equals("Rajshahi") && cbTo.equals("Dhaka"))
+      {
+        sql = "select * from DR" ;
+        rs = connection.getResult(sql);
+        fareTable.setModel(DbUtils.resultSetToTableModel(rs));
+      }
+      else if(cbFrom.getSelectedItem().equals(cbTo.getSelectedItem()))
+      {
+        DefaultTableModel dm = (DefaultTableModel)fareTable.getModel();
+        dm.getDataVector().removeAllElements();
+        dm.fireTableDataChanged(); 
+
+        fareTable.setModel(dm);
+      }
        }
+
        catch(Exception exception)
        {
         JOptionPane.showMessageDialog(null, exception);
        }
-
     }
   else if (evt.getStateChange() == ItemEvent.DESELECTED) {
       // Item is no longer selected

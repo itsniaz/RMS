@@ -6,13 +6,13 @@ import javax.swing.JOptionPane;
 public class mysqlConn
 {
 
-  static final String DB_URL = "jdbc:mysql://localhost:3306/rms";
-//	static final String DB_URL = "jdbc:mysql://alpha.hostmydreams.net/trialnly_rms";
+  //static final String DB_URL = "jdbc:mysql://localhost:3306/rms";
+	static final String DB_URL = "jdbc:mysql://alpha.hostmydreams.net/trialnly_rms";
  
-             // static final String USER = "trialnly";
-             //static final String PASS = "Wuff_1234";
-             static final String USER = "root";
-			 static final String PASS = "";
+             static final String USER = "trialnly";
+             static final String PASS = "Wuff_1234";
+            // static final String USER = "root";
+			 //static final String PASS = "";
 
         Connection conn;
         Statement stmt;
@@ -171,7 +171,7 @@ public class mysqlConn
         }
         catch(Exception e)
         {
-            JOptionPane.showMessageDialog(null, "Query Failed");
+            JOptionPane.showMessageDialog(null, e);
         }
 
         return null;
